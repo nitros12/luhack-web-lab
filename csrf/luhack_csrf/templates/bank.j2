@@ -1,0 +1,49 @@
+{% from "macros.j2" import with_errors %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>The bank of poo-helly</title>
+    </head>
+    <body>
+        <form method="POST" action="{{ login_url }}">
+            <fieldset>
+                <legend>Login{{ " (Logged in as {})".format(current_user) if current_user else "" }}</legend>
+
+                <div>
+                    {{ login_form.user.label }}
+                    {{ with_errors(login_form.user) }}
+                </div>
+                <div>
+                    <button type="submit">Login</button>
+                </div>
+            </fieldset>
+        </form>
+        {% if current_user %}
+            <form method="GET" action="{{ transfer_url }}">
+                <fieldset>
+                    <legend>Send money</legend>
+
+                    <div>
+                        {{ transfer_form.dest.label }}
+                        {{ with_errors(transfer_form.dest) }}
+                    </div>
+                    <div>
+                        {{ transfer_form.amount.label }}
+                        {{ with_errors(transfer_form.amount) }}
+                    </div>
+                    <div>
+                        <button type="submit">Send</button>
+                    </div>
+                </fieldset>
+            </form>
+        {% endif %}
+        <table cellspacing="0" cellpadding="0" border="0">
+            {% for (from_, to, amount) in transactions %}
+                <tr><td>{{ from_ }} --> {{ to }}: ${{ amount }}</td></tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

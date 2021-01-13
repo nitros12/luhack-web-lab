@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  sqli_db:
+    build:
+      context: sqli/.
+      dockerfile: Dockerfile.postgres
+    env_file: .env
+    restart: always
+    volumes:
+      - db_data:/var/lib/postgresql/data/
+    networks:
+      - sqli_db
+
+  sqli:
+    build: sqli/.
+    restart: always
+    depends_on:
+      - sqli_db
+    env_file: .env
+    environment:
+      - DB_URL=postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@sqli_db:$POSTGRES_PORT/$POSTGRES_DATABASE
+    networks:
+      - sqli_db
+      - caddy
+    command: /bin/sh start_sqli.sh
+    labels:
+      caddy: localhost:80/sqli localhost:80/sqli/*
+      # caddy.uri: "strip_prefix /sqli"
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  ssti:
+    build: ssti/.
+    restart: always
+    env_file: .env
+    networks:
+      - caddy
+    command: /bin/sh start_ssti.sh
+    labels:
+      caddy: localhost:80/ssti localhost:80/ssti/*
+      # caddy.uri: "strip_prefix /ssti"
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  csrf:
+    build: csrf/.
+    restart: always
+    env_file: .env
+    networks:
+      - caddy
+    command: /bin/sh start_csrf.sh
+    labels:
+      caddy: localhost:80/csrf localhost:80/csrf/*
+      # caddy.uri: "strip_prefix /csrf"
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  index:
+    build: index/.
+    restart: always
+    env_file: .env
+    networks:
+      - caddy
+    command: /bin/sh start_index.sh
+    labels:
+      caddy: localhost:80/
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:alpine
+    restart: always
+    ports:
+      - 8012:80
+    networks:
+      - caddy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # this volume is needed to keep the certificates
+      # otherwise, new ones will be re-issued upon restart
+      - caddy_data:/data
+    labels:
+      caddy.auto_https: "off"
+
+networks:
+  sqli_db:
+  caddy:
+
+volumes:
+  caddy_data: {}
+  db_data: {}

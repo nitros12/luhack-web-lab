@@ -1,0 +1,25 @@
+{% from "macros.j2" import with_errors %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Kerry the clicker</title>
+    </head>
+    <body>
+        <form method="POST" action="{{ request.url }}">
+            <fieldset>
+                <legend>Kerry clicks on any link you send her</legend>
+
+                <div>
+                    {{ form.link.label }}
+                    {{ with_errors(form.link) }}
+                </div>
+                <div>
+                    <button type="submit">Send</button>
+                </div>
+            </fieldset>
+        </form>
+    </body>
+</html>
