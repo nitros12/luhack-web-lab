@@ -25,7 +25,7 @@ services:
       - caddy
     command: /bin/sh start_sqli.sh
     labels:
-      caddy: localhost:80/sqli localhost:80/sqli/*
+      caddy: :80/sqli :80/sqli/*
       # caddy.uri: "strip_prefix /sqli"
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
@@ -37,7 +37,7 @@ services:
       - caddy
     command: /bin/sh start_ssti.sh
     labels:
-      caddy: localhost:80/ssti localhost:80/ssti/*
+      caddy: :80/ssti :80/ssti/*
       # caddy.uri: "strip_prefix /ssti"
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
@@ -49,7 +49,7 @@ services:
       - caddy
     command: /bin/sh start_csrf.sh
     labels:
-      caddy: localhost:80/csrf localhost:80/csrf/*
+      caddy: :80/csrf :80/csrf/*
       # caddy.uri: "strip_prefix /csrf"
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
@@ -61,7 +61,7 @@ services:
       - caddy
     command: /bin/sh start_index.sh
     labels:
-      caddy: localhost:80/
+      caddy: :80/
       caddy.reverse_proxy: "{{upstreams 8080}}"
 
   caddy:
